@@ -1,15 +1,9 @@
 const express = require('express');
 const { celebrate, Joi, Segments } = require('celebrate');
 const { getQuiz, createQuiz } = require('../controllers/quiz');
+const { checkUserId } = require('../middlewares/authorizer');
+const { submitAnswer } = require('../controllers/question');
 const router = express.Router();
-
-router.get('/:quizId',celebrate({
-        [Segments.PARAMS]:Joi.object({
-            quizId: Joi.number().positive().required()
-        })
-    }),
-    (req, res, next)=>getQuiz(req).then(data=>res.status(200).json(data)).catch(next)
-);
 
 router.post('/',celebrate({
         [Segments.BODY]: Joi.object({
@@ -23,4 +17,25 @@ router.post('/',celebrate({
     }),
     (req, res, next)=>createQuiz(req).then(data=>res.status(201).json(data)).catch(next)
 );
+
+router.get('/:quizId',celebrate({
+        [Segments.PARAMS]:Joi.object({
+            quizId: Joi.number().positive().required()
+        })
+    }),
+    (req, res, next)=>getQuiz(req).then(data=>res.status(200).json(data)).catch(next)
+);
+
+router.post('/:quizId/question/:questionId', checkUserId, celebrate({
+        [Segments.PARAMS]:Joi.object({
+            quizId: Joi.number().positive().required(),
+            questionId: Joi.number().positive().required()
+        }),
+        [Segments.BODY]: Joi.object({
+            selectedOption: Joi.number().allow(1,2,3,4).required()
+        })
+    }),
+    (req, res, next) => submitAnswer(req).then(data=>res.status(201).json(data)).catch(next)
+);
+
 module.exports = router;
