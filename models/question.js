@@ -21,7 +21,11 @@ module.exports = (sequelize, DataTypes) => {
   Question.init({
     text: DataTypes.TEXT,
     options: DataTypes.JSON,
-    correct_option: DataTypes.INTEGER
+    correct_option: DataTypes.INTEGER,
+    quiz_id: { 
+      type: DataTypes.INTEGER,
+      allowNull: false
+    }
   }, {
     sequelize,
     modelName: 'Question',
