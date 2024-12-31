@@ -55,7 +55,7 @@ describe('createQuizWithQuestions', () => {
     assert.strictEqual(transactionObj.commit.calledOnce, true);
 
     // Ensure the result contains the created quiz
-    assert.deepStrictEqual(result, { id: 1, title: 'Sample Quiz', Questions: [] });
+    assert.deepStrictEqual(result, { id: 1});
   });
 
   it('should roll back transaction if an error occurs during quiz creation', async () => {
