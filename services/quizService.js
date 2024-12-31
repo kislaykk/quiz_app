@@ -18,7 +18,7 @@ async function createQuizWithQuestions(quizData, questionsData) {
     });
 
     await t.commit();
-    return quiz;  // Return the created quiz or any other useful info
+    return {id:quiz.id};  // Return the created quiz or any other useful info
   } catch (error) {
     // If any error occurs, roll back the transaction
     await t.rollback();
