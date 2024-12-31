@@ -22,7 +22,8 @@ module.exports = (sequelize, DataTypes) => {
   Answer.init({
     question_id: DataTypes.INTEGER,
     selected_option: DataTypes.INTEGER,
-    is_correct: DataTypes.BOOLEAN
+    is_correct: DataTypes.BOOLEAN,
+    answered_by: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Answer',
