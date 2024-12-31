@@ -1,4 +1,4 @@
-const { Quiz, sequelize } = require('../models');
+const { Quiz, sequelize, Question } = require('../models');
 
 async function createQuizWithQuestions(quizData, questionsData) {
   const t = await sequelize.transaction();  // Start a new transaction
@@ -26,4 +26,37 @@ async function createQuizWithQuestions(quizData, questionsData) {
   }
 }
 
-module.exports = { createQuizWithQuestions };
+async function getQuiz(quizId) {
+  try {
+    const quiz = await Quiz.findOne({
+      where: { id: quizId },
+      attributes: ['title','id'], // Get only the quiz title
+      include: [
+        {
+          model: Question,
+          attributes: ['id', 'text', 'options'], // Get specific fields from questions
+        },
+      ],
+    });
+
+    if (!quiz) {
+      return { message: 'Quiz not found' };
+    }
+
+    // Format the response
+    return {
+      title: quiz.title,
+      id: quiz.id,
+      questions: quiz.Questions.map((question) => ({
+        id: question.id,
+        text: question.text,
+        options: question.options,
+      })),
+    };
+  } catch (error) {
+    console.error('Error fetching quiz:', error);
+    throw error; // Rethrow the error to handle it in the calling code
+  }
+}
+
+module.exports = { createQuizWithQuestions, getQuiz };
