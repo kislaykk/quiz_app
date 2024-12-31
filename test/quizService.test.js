@@ -1,7 +1,7 @@
 const assert = require('assert');
 const sinon = require('sinon');
 const { sequelize, Quiz, Question } = require('../models');
-const { createQuizWithQuestions } = require('../services/quizService');
+const { createQuizWithQuestions, getQuiz } = require('../services/quizService');
 
 describe('createQuizWithQuestions', () => {
   let transactionStub;
@@ -77,5 +77,99 @@ describe('createQuizWithQuestions', () => {
       // Ensure the transaction was rolled back
       assert.strictEqual(transactionObj.rollback.calledOnce, true);
     }
+  });
+});
+
+describe('getQuiz', () => {
+  let findOneStub;
+
+  beforeEach(() => {
+    // Stub the `findOne` method of the Quiz model
+    findOneStub = sinon.stub(Quiz, 'findOne');
+  });
+
+  afterEach(() => {
+    // Restore the stubbed methods
+    sinon.restore();
+  });
+
+  it('should return quiz details with questions if quiz is found', async () => {
+    // Mock data for Quiz and its associated Questions
+    const mockQuiz = {
+      id: 1,
+      title: 'Sample Quiz',
+      Questions: [
+        { id: 1, text: 'What is 2 + 2?', options: ['1', '2', '3', '4'] },
+        { id: 2, text: 'What is the capital of France?', options: ['Berlin', 'Paris', 'Rome', 'Madrid'] },
+      ],
+    };
+
+    // Stub the `findOne` method to return mock data
+    findOneStub.resolves(mockQuiz);
+
+    // Call the function
+    const result = await getQuiz(1);
+
+    // Assert the result
+    assert.deepStrictEqual(result, {
+      title: 'Sample Quiz',
+      id: 1,
+      questions: [
+        { id: 1, text: 'What is 2 + 2?', options: ['1', '2', '3', '4'] },
+        { id: 2, text: 'What is the capital of France?', options: ['Berlin', 'Paris', 'Rome', 'Madrid'] },
+      ],
+    });
+
+    // Verify the stub was called with the correct arguments
+    sinon.assert.calledOnceWithExactly(findOneStub, {
+      where: { id: 1 },
+      attributes: ['title', 'id'],
+      include: [
+        {
+          model: Question,
+          attributes: ['id', 'text', 'options'],
+        },
+      ],
+    });
+  });
+
+  it('should return a "Quiz not found" message if no quiz is found', async () => {
+    // Stub the `findOne` method to return null
+    findOneStub.resolves(null);
+
+    // Call the function
+    const result = await getQuiz(99);
+
+    // Assert the result
+    assert.deepStrictEqual(result, { message: 'Quiz not found' });
+
+    // Verify the stub was called with the correct arguments
+    sinon.assert.calledOnceWithExactly(findOneStub, {
+      where: { id: 99 },
+      attributes: ['title', 'id'],
+      include: [
+        {
+          model: Question,
+          attributes: ['id', 'text', 'options'],
+        },
+      ],
+    });
+  });
+
+  it('should throw an error if an exception occurs', async () => {
+    // Stub the `findOne` method to throw an error
+    findOneStub.rejects(new Error('Database error'));
+
+    // Call the function and assert it throws an error
+    try {
+      await getQuiz(1);
+      // Fail the test if no error is thrown
+      assert.fail('Expected error was not thrown');
+    } catch (error) {
+      assert.strictEqual(error.message, 'Database error');
+    }
+
+    // Verify the stub was called
+    sinon.assert.calledOnce(findOneStub);
   });
 });
