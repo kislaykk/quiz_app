@@ -14,6 +14,9 @@ module.exports = (sequelize, DataTypes) => {
       Quiz.Questions=Quiz.hasMany(models.Question,{
         foreignKey: 'quiz_id'
       });
+      Quiz.Results=Quiz.hasMany(models.Result,{
+        foreignKey: 'quiz_id'
+      });
     }
   }
   Quiz.init({

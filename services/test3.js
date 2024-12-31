@@ -1,2 +1,2 @@
 const {submitAnswer} = require('./ansService');
-submitAnswer(15,86,'qwerty',1).then(console.log);
+submitAnswer(1,2,'qwerty',1).then(console.log);
