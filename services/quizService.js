@@ -1,27 +1,23 @@
-const { Quiz, Question, sequelize } = require('../models'); // Adjust the path to where your models are defined
+const { Quiz, sequelize } = require('../models');
 
 async function createQuizWithQuestions(quizData, questionsData) {
   const t = await sequelize.transaction();  // Start a new transaction
   
   try {
-    // 1. Create the quiz
     const quiz = await Quiz.create({
-      title: quizData.title
-    }, { transaction: t });
-
-    // 2. Create questions associated with the quiz
-    const questions = await Promise.all(questionsData.map(question => 
-      Question.create({
+      title: quizData.title,
+      Questions: questionsData.map(question=>({
         text: question.text,
-        options: question.options,  // Assume it's an array of 4 options
-        correct_option: question.correct_option,
-        quiz_id: quiz.id  // Associate the question with the newly created quiz
-      }, { transaction: t })
-    ));
+        options: question.options,
+        correct_option: question.correct_option
+      }))
+    },
+    {
+      include: [Quiz.Questions],
+      transaction: t
+    });
 
-    // If everything is successful, commit the transaction
     await t.commit();
-
     return quiz;  // Return the created quiz or any other useful info
   } catch (error) {
     // If any error occurs, roll back the transaction

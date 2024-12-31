@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Question.belongsTo(models.Quiz, {
+      Question.Quiz=Question.belongsTo(models.Quiz, {
         foreignKey: 'quiz_id',  // foreign key in the Questions table
         onDelete: 'CASCADE',    // If the referenced Quiz is deleted, delete the Question
         onUpdate: 'CASCADE'     // If the referenced Quiz is updated, update the foreign key
