@@ -1,4 +1,6 @@
 const { Answer, Question } = require('../models'); // Adjust the path as needed
+const { CustomError } = require('../utils/customError');
+const errorCodes = require('../config/errorCodes.json');
 
 async function submitAnswer(quizId, questionId, userId, selectedOption) {
   try {
@@ -11,7 +13,7 @@ async function submitAnswer(quizId, questionId, userId, selectedOption) {
     });
 
     if (existingAnswer) {
-      return { message: 'Already answered' };
+      throw new CustomError(errorCodes.duplicateAttemp, 'Already Answered');
     }
 
     // Retrieve the question to get the correct option
@@ -24,7 +26,7 @@ async function submitAnswer(quizId, questionId, userId, selectedOption) {
     });
 
     if (!question) {
-      return { message: 'Question not found or does not belong to the quiz' };
+      throw new CustomError(errorCodes.notFound.question, 'Question not found or does not belong to the quiz');
     }
 
     // Check if the selected option is correct

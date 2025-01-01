@@ -1,4 +1,6 @@
 const { Quiz, Result, Question, Answer } = require('../models');
+const {CustomError} = require('../utils/customError');
+const errorCodes = require('../config/errorCodes.json');
 
 async function getResult(quizId, userId){
     try {
@@ -35,7 +37,7 @@ async function getResult(quizId, userId){
       });
   
       if (!quiz) {
-        return { found: false, message: 'Quiz not found.' };
+        throw new CustomError(errorCodes.notFound.quiz,'Quiz is not found');
       }
   
       // Get all question IDs for the quiz

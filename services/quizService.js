@@ -1,4 +1,6 @@
+const errorCodes = require('../config/errorCodes.json');
 const { Quiz, sequelize, Question } = require('../models');
+const { CustomError } = require('../utils/customError');
 
 async function createQuizWithQuestions(quizData, questionsData) {
   const t = await sequelize.transaction();  // Start a new transaction
@@ -40,7 +42,7 @@ async function getQuiz(quizId) {
     });
 
     if (!quiz) {
-      return { message: 'Quiz not found' };
+      throw new CustomError(errorCodes.notFound.quiz,'Quiz Not Found');
     }
 
     // Format the response

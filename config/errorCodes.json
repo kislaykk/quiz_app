@@ -1,3 +1,7 @@
 {
-    
+    "notFound":{
+        "quiz": "QUIZ_NOT_FOUND",
+        "question":"QUESTION_NOT_FOUND"
+    },
+    "duplicateAttemp":"DUPLICATE_ATTEMPT"
 }
