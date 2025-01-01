@@ -63,4 +63,4 @@ Ensure that you have Docker and Docker Compose installed on your machine.
 
 After this the application will be accessible in http://localhost:3000
 
-please use the post man collection to play around!!!
+please use the post man collection *Quiz App.postman_collection.json* to play around!!! 
