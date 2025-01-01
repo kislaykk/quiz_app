@@ -2,6 +2,7 @@ const sinon = require('sinon');
 const assert = require('assert');
 const { submitAnswer } = require('../services/ansService');
 const { Answer, Question } = require('../models');
+const errorCodes = require('../config/errorCodes.json');
 
 describe('submitAnswer', () => {
   let answerFindOneStub,questionFindOneStub ,createStub;
@@ -23,26 +24,34 @@ describe('submitAnswer', () => {
     sinon.restore();
   });
 
-  it('should return "Already answered" if the user has already answered the question', async () => {
+  it('should throw error "Already answered" if the user has already answered the question', async () => {
     // Stub `findOne` to simulate that an answer already exists for the user and question
     answerFindOneStub.resolves({}); // Return a dummy object to simulate an existing answer
+    try {
+      const result = await submitAnswer(1, 1, 101, 2);
+      assert.fail('Expected error to be thrown');
+    } catch (error) {
+      assert.strictEqual(error.code, errorCodes.duplicateAttemp);
+      assert.strictEqual(error.message, 'Already Answered');
+      assert.strictEqual(answerFindOneStub.calledOnce, true); // Ensure `findOne` was called once
+    }
 
-    const result = await submitAnswer(1, 1, 101, 2);
-
-    assert.strictEqual(result.message, 'Already answered');
-    assert.strictEqual(answerFindOneStub.calledOnce, true); // Ensure `findOne` was called once
   });
 
-  it('should return "Question not found or does not belong to the quiz" if the question does not exist or does not belong to the quiz', async () => {
+  it('should throw error "Question not found or does not belong to the quiz" if the question does not exist or does not belong to the quiz', async () => {
     // Stub `findOne` to simulate that the question is not found
     answerFindOneStub.resolves(null); // No question found
     questionFindOneStub.resolves(null);
+    try {
+      const result = await submitAnswer(1, 1, 101, 2);
+      assert.fail('Expected to fail');     
+    } catch (error) {
+      assert.strictEqual(error.code, errorCodes.notFound.question);
+      assert.strictEqual(error.message, 'Question not found or does not belong to the quiz');
+      assert.strictEqual(answerFindOneStub.calledOnce, true);
+      assert.strictEqual(questionFindOneStub.calledOnce, true);
+    }
 
-    const result = await submitAnswer(1, 1, 101, 2);
-
-    assert.strictEqual(result.message, 'Question not found or does not belong to the quiz');
-    assert.strictEqual(answerFindOneStub.calledOnce, true);
-    assert.strictEqual(questionFindOneStub.calledOnce, true);
 
   });
 

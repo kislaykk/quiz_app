@@ -2,6 +2,7 @@ const assert = require('assert');
 const sinon = require('sinon');
 const { sequelize, Quiz, Question } = require('../models');
 const { createQuizWithQuestions, getQuiz } = require('../services/quizService');
+const errorCodes = require('../config/errorCodes.json');
 
 describe('createQuizWithQuestions', () => {
   let transactionStub;
@@ -133,27 +134,31 @@ describe('getQuiz', () => {
     });
   });
 
-  it('should return a "Quiz not found" message if no quiz is found', async () => {
+  it('should throw error "Quiz not found" message if no quiz is found', async () => {
     // Stub the `findOne` method to return null
     findOneStub.resolves(null);
-
-    // Call the function
-    const result = await getQuiz(99);
-
-    // Assert the result
-    assert.deepStrictEqual(result, { message: 'Quiz not found' });
-
-    // Verify the stub was called with the correct arguments
-    sinon.assert.calledOnceWithExactly(findOneStub, {
-      where: { id: 99 },
-      attributes: ['title', 'id'],
-      include: [
-        {
-          model: Question,
-          attributes: ['id', 'text', 'options'],
-        },
-      ],
-    });
+    try {
+      // Call the function
+      const result = await getQuiz(99);
+      assert.fail('this should not execute');
+    } catch (error) {
+      assert.strictEqual(error.code, errorCodes.notFound.quiz);
+      // Assert the result
+      assert.deepStrictEqual(error.message, 'Quiz Not Found');
+  
+      // Verify the stub was called with the correct arguments
+      sinon.assert.calledOnceWithExactly(findOneStub, {
+        where: { id: 99 },
+        attributes: ['title', 'id'],
+        include: [
+          {
+            model: Question,
+            attributes: ['id', 'text', 'options'],
+          },
+        ],
+      });
+      
+    }
   });
 
   it('should throw an error if an exception occurs', async () => {

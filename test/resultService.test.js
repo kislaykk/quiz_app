@@ -2,6 +2,7 @@ const sinon = require('sinon');
 const assert = require('assert');
 const { getResult } = require('../services/resultService'); // Adjust the path
 const { Quiz, Result, Question, Answer } = require('../models'); // Adjust the path
+const errorCodes = require('../config/errorCodes.json');
 
 describe('getResult', () => {
   let rfindOneStub, qfindOneStub, findAllStub, createStub;
@@ -48,13 +49,16 @@ describe('getResult', () => {
     // Stub `findOne` to simulate no quiz found
     rfindOneStub.resolves(null);
     qfindOneStub.resolves(null);
+    try {
+      const result = await getResult(1, 101);
+      assert.fail('this should not pass');
+    } catch (error) {
+      assert.strictEqual(error.code, errorCodes.notFound.quiz);
+      assert.strictEqual(error.message, 'Quiz is not found');
+      assert.strictEqual(qfindOneStub.calledOnce, true); // Ensure `findOne` was called once
+      assert.strictEqual(rfindOneStub.calledOnce, true); // Ensure `findOne` was called once 
+    }
 
-    const result = await getResult(1, 101);
-
-    assert.strictEqual(result.found, false);
-    assert.strictEqual(result.message, 'Quiz not found.');
-    assert.strictEqual(qfindOneStub.calledOnce, true); // Ensure `findOne` was called once
-    assert.strictEqual(rfindOneStub.calledOnce, true); // Ensure `findOne` was called once
 
   });
 
@@ -151,7 +155,7 @@ describe('getResult', () => {
       await getResult(1, 101);
       assert.fail('Expected error to be thrown');
     } catch (error) {
-      assert.strictEqual(error.message, 'Failed to process the result.');
+      assert.strictEqual(error.message, 'Database error');
     }
   });
 });
