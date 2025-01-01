@@ -16,7 +16,7 @@ app.use((err,req,res,next)=>{
     switch(err.code){
       case errorCodes.notFound.question:
       case errorCodes.notFound.quiz:
-        return res.status(400).json({message:err.message});
+        return res.status(404).json({message:err.message});
       case errorCodes.duplicateAttemp:
         return res.status(200).json({message:err.message});
       default:
