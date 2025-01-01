@@ -64,3 +64,108 @@ Ensure that you have Docker and Docker Compose installed on your machine.
 After this the application will be accessible in http://localhost:3000
 
 please use the post man collection *Quiz App.postman_collection.json* to play around!!! 
+
+### Known Issues
+currently we dont have anu validation layer , we are simply checking if the submission is made by a user(with userid headers)
+
+
+# Quiz App API Documentation
+
+## Base URL
+`http://localhost:3000`
+
+---
+
+## Endpoints
+
+### 1. **Get Quiz**
+
+- **Endpoint:** `GET /quiz/:quizId`
+- **Description:** Retrieves a specific quiz by its ID.
+- **Request Example:**
+  - URL: `http://localhost:3000/quiz/3`
+  - Method: `GET`
+- **Response:** 
+  - Returns the details of the quiz with ID `3`.
+
+---
+
+### 2. **Create Quiz**
+
+- **Endpoint:** `POST /quiz`
+- **Description:** Creates a new quiz with a title and questions.
+- **Request Example:**
+  - URL: `http://localhost:3000/quiz`
+  - Method: `POST`
+  - Request Body:
+    ```json
+    {
+      "title": "difficult quiz part 2",
+      "questions": [
+        {
+          "text": "what is the ninth plane?",
+          "options": [
+            "God Knows",
+            "Mars",
+            "Europa",
+            "None"
+          ],
+          "correct_option": 4
+        },
+        {
+          "text": "what is the third plane?",
+          "options": [
+            "Jupiter",
+            "Mars",
+            "Europa",
+            "None"
+          ],
+          "correct_option": 2
+        }
+      ]
+    }
+    ```
+- **Response:** 
+  - Returns the created quiz object with the assigned `quizId`.
+
+---
+
+### 3. **Submit Answer**
+
+- **Endpoint:** `POST /quiz/:quizId/question/:questionId`
+- **Description:** Submits a selected answer for a specific question in a quiz.
+- **Request Example:**
+  - URL: `http://localhost:3000/quiz/22/question/4`
+  - Method: `POST`
+  - Headers:
+    - `userId`: `qwerty`
+  - Request Body:
+    ```json
+    {
+      "selectedOption": 1
+    }
+    ```
+- **Response:**
+  - Returns the result of the answer submission (correct/incorrect).
+
+---
+
+### 4. **Get Results**
+
+- **Endpoint:** `GET /quiz/:quizId/results`
+- **Description:** Retrieves the results for a specific quiz for a given user.
+- **Request Example:**
+  - URL: `http://localhost:3000/quiz/29/results`
+  - Method: `GET`
+  - Headers:
+    - `userId`: `qwerty`
+- **Response:**
+  - Returns the results of the quiz with `quizId` `29` for the user `qwerty`.
+
+---
+
+## Authentication
+
+- Some requests require a `userId` to be included in the headers for identifying the user. For example:
+  ```plaintext
+  userId: qwerty
