@@ -48,6 +48,19 @@ Ensure that you have Docker and Docker Compose installed on your machine.
 1. **Clone the repository**:
    If you haven't already, clone the repository to your local machine:
    ```bash
-   git clone <repository-url>
-   cd <project-directory>
+   git clone https://github.com/kislaykk/quiz_app.git
+   cd quiz_app
 
+2. **Build the Docker containers**:
+   Build the Docker containers using Docker Compose:
+   ```bash
+   docker-compose build
+
+3. **Start the containers**:
+   Start the application and PostgreSQL containers:
+   ```bash
+   docker-compose up
+
+After this the application will be accessible in http://localhost:3000
+
+please use the post man collection to play around!!!
