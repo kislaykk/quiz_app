@@ -104,7 +104,7 @@ async function getResult(quizId, userId){
       };
     } catch (error) {
       console.error('Error fetching result or processing answers:', error);
-      throw new Error('Failed to process the result.');
+      throw error; // Rethrow the error to handle it in the calling code
     }
   };
   
